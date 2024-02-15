@@ -22,6 +22,8 @@ import com.dji.sdk.sample.internal.utils.ModuleVerificationUtil;
 import com.dji.sdk.sample.internal.utils.OnScreenJoystick;
 import com.dji.sdk.sample.internal.utils.ToastUtils;
 import com.dji.sdk.sample.internal.view.PresentableView;
+import com.dji.sdk.sample.internal.api.OwnWebserverRequest;
+
 
 import java.util.Timer;
 import java.util.TimerTask;
