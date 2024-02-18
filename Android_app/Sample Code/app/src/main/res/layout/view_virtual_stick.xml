@@ -55,7 +55,7 @@
         android:layout_marginRight="10dp"
         android:layout_marginTop="10dp"
         android:layout_toLeftOf="@id/btn_vertical_control_mode"
-        android:text="Forward"
+        android:text="api"
         style="@style/common_button"/>
 
     <Button

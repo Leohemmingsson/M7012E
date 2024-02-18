@@ -4,6 +4,7 @@ import static java.lang.String.valueOf;
 
 import android.app.Service;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -23,8 +24,10 @@ import com.dji.sdk.sample.internal.utils.OnScreenJoystick;
 import com.dji.sdk.sample.internal.utils.ToastUtils;
 import com.dji.sdk.sample.internal.view.PresentableView;
 import com.dji.sdk.sample.internal.api.OwnWebserverRequest;
+import com.dji.sdk.sample.internal.api.OwnWebserverRequest.OnRequestCompleteListener;
 
 
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -47,7 +50,7 @@ import dji.sdk.flightcontroller.Simulator;
 /**
  * Class for virtual stick.
  */
-public class VirtualStickView extends RelativeLayout implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, PresentableView {
+public class VirtualStickView extends RelativeLayout implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, PresentableView, OwnWebserverRequest.OnRequestCompleteListener {
     private Button btnEnableVirtualStick;
     private Button btnDisableVirtualStick;
     private Button btnHorizontalCoordinate;
@@ -198,6 +201,7 @@ public class VirtualStickView extends RelativeLayout implements View.OnClickList
 
                 if (Math.abs(pY) < 0.02) {
                     pY = 0;
+
                 }
                 float pitchJoyControlMaxSpeed = 1;
                 float rollJoyControlMaxSpeed = 1;
@@ -251,6 +255,17 @@ public class VirtualStickView extends RelativeLayout implements View.OnClickList
         screenJoystickRight.setJoystickListener(null);
     }
 
+    @Override
+    public void onRequestComplete(Map<String, String> resultMap) {
+        if (resultMap != null) {
+            // Access the resultMap and use it as needed
+            textView.setVisibility(VISIBLE);
+            // String value = resultMap.get("command");
+            String value = "got API response";
+            textView.setText(value);
+        }
+    }
+
 
     @Override
     public void onClick(View v) {
@@ -293,8 +308,11 @@ public class VirtualStickView extends RelativeLayout implements View.OnClickList
 
                 break;
             case R.id.btn_yaw_control_mode:
-
+                Log.i("Button clicked", "Clicked on button");
+                OwnWebserverRequest request = new OwnWebserverRequest(this);
+                request.execute("http://130.240.155.208:8000");
                 break;
+
             case R.id.btn_vertical_control_mode:
                 // Lotation
                 yaw = (float) 20;
