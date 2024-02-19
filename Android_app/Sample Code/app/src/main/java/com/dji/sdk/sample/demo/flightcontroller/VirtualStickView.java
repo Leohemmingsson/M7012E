@@ -1,5 +1,6 @@
 package com.dji.sdk.sample.demo.flightcontroller;
 
+import static com.google.android.gms.internal.zzahn.runOnUiThread;
 import static java.lang.String.valueOf;
 
 import android.app.Service;
@@ -27,6 +28,11 @@ import com.dji.sdk.sample.internal.api.OwnWebserverRequest;
 import com.dji.sdk.sample.internal.api.OwnWebserverRequest.OnRequestCompleteListener;
 
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -308,9 +314,22 @@ public class VirtualStickView extends RelativeLayout implements View.OnClickList
 
                 break;
             case R.id.btn_yaw_control_mode:
-                Log.i("Button clicked", "Clicked on button");
-                OwnWebserverRequest request = new OwnWebserverRequest(this);
-                request.execute("http://130.240.155.208:8000");
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        final String response = performGetRequest("http://130.240.155.208:8000/");
+
+                        // Update UI on main thread
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                textView.setVisibility(VISIBLE);
+                                textView.setText(response);
+                            }
+                        });
+                    }
+                }).start();
+
                 break;
 
             case R.id.btn_vertical_control_mode:
@@ -394,4 +413,33 @@ public class VirtualStickView extends RelativeLayout implements View.OnClickList
             }
         }
     }
+
+    private String performGetRequest(String urlString) {
+        HttpURLConnection urlConnection = null;
+        StringBuilder result = new StringBuilder();
+
+        try {
+            URL url = new URL(urlString);
+            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setRequestMethod("GET");
+
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+
+                    result.append(line);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (urlConnection != null) {
+                urlConnection.disconnect();
+            }
+        }
+
+
+        return result.toString();
+    }
+    
 }
