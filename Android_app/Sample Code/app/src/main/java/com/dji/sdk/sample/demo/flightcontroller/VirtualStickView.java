@@ -56,7 +56,7 @@ import dji.sdk.flightcontroller.Simulator;
 /**
  * Class for virtual stick.
  */
-public class VirtualStickView extends RelativeLayout implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, PresentableView, OwnWebserverRequest.OnRequestCompleteListener {
+public class VirtualStickView extends RelativeLayout implements PresentableView{
     private Button btnEnableVirtualStick;
     private Button btnDisableVirtualStick;
     private Button btnHorizontalCoordinate;
@@ -72,12 +72,7 @@ public class VirtualStickView extends RelativeLayout implements View.OnClickList
     private OnScreenJoystick screenJoystickLeft;
 
     private Timer sendVirtualStickDataTimer;
-    private SendVirtualStickDataTask sendVirtualStickDataTask;
 
-    private float pitch;
-    private float roll;
-    private float yaw;
-    private float throttle;
     private boolean isSimulatorActived = false;
     private FlightController flightController = null;
     private Simulator simulator = null;
@@ -96,20 +91,14 @@ public class VirtualStickView extends RelativeLayout implements View.OnClickList
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        setUpListeners();
     }
 
     @Override
     protected void onDetachedFromWindow() {
         if (null != sendVirtualStickDataTimer) {
-            if (sendVirtualStickDataTask != null) {
-                sendVirtualStickDataTask.cancel();
-
-            }
             sendVirtualStickDataTimer.cancel();
             sendVirtualStickDataTimer.purge();
             sendVirtualStickDataTimer = null;
-            sendVirtualStickDataTask = null;
         }
         tearDownListeners();
         super.onDetachedFromWindow();
@@ -173,85 +162,6 @@ public class VirtualStickView extends RelativeLayout implements View.OnClickList
         }
     }
 
-    private void setUpListeners() {
-        if (simulator != null) {
-            simulator.setStateCallback(new SimulatorState.Callback() {
-                @Override
-                public void onUpdate(@NonNull final SimulatorState simulatorState) {
-                    ToastUtils.setResultToText(textView,
-                            "Yaw : "
-                                    + simulatorState.getYaw()
-                                    + ","
-                                    + "X : "
-                                    + simulatorState.getPositionX()
-                                    + "\n"
-                                    + "Y : "
-                                    + simulatorState.getPositionY()
-                                    + ","
-                                    + "Z : "
-                                    + simulatorState.getPositionZ());
-                }
-            });
-        } else {
-            ToastUtils.setResultToToast("Simulator disconnected!");
-        }
-
-        screenJoystickLeft.setJoystickListener(new OnScreenJoystickListener() {
-            // This is right controller
-
-            @Override
-            public void onTouch(OnScreenJoystick joystick, float pX, float pY) {
-                if (Math.abs(pX) < 0.02) {
-                    pX = 0;
-                }
-
-                if (Math.abs(pY) < 0.02) {
-                    pY = 0;
-
-                }
-                float pitchJoyControlMaxSpeed = 1;
-                float rollJoyControlMaxSpeed = 1;
-
-                pitch = pitchJoyControlMaxSpeed * pY;
-                roll = rollJoyControlMaxSpeed * pX;
-
-                if (null == sendVirtualStickDataTimer) {
-                    sendVirtualStickDataTask = new SendVirtualStickDataTask();
-                    sendVirtualStickDataTimer = new Timer();
-                    sendVirtualStickDataTimer.schedule(sendVirtualStickDataTask, 100, 200);
-                }
-            }
-        });
-
-        screenJoystickRight.setJoystickListener(new OnScreenJoystickListener() {
-        // This is the left controller
-            @Override
-            public void onTouch(OnScreenJoystick joystick, float pX, float pY) {
-                if (Math.abs(pX) < 0.02) {
-                    pX = 0;
-                }
-
-                if (Math.abs(pY) < 0.02) {
-                    pY = 0;
-                }
-                float verticalJoyControlMaxSpeed = (float) 0.4;
-                float yawJoyControlMaxSpeed = 2;
-
-                //textView.setVisibility(VISIBLE);
-                //textView.setText(valueOf(pX));
-
-                yaw = yawJoyControlMaxSpeed * pX;
-                throttle = verticalJoyControlMaxSpeed * pY;
-
-                if (null == sendVirtualStickDataTimer) {
-                    sendVirtualStickDataTask = new SendVirtualStickDataTask();
-                    sendVirtualStickDataTimer = new Timer();
-                    sendVirtualStickDataTimer.schedule(sendVirtualStickDataTask, 0, 200);
-                }
-            }
-        });
-    }
-
     private void tearDownListeners() {
         Simulator simulator = ModuleVerificationUtil.getSimulator();
         if (simulator != null) {
@@ -259,17 +169,6 @@ public class VirtualStickView extends RelativeLayout implements View.OnClickList
         }
         screenJoystickLeft.setJoystickListener(null);
         screenJoystickRight.setJoystickListener(null);
-    }
-
-    @Override
-    public void onRequestComplete(Map<String, String> resultMap) {
-        if (resultMap != null) {
-            // Access the resultMap and use it as needed
-            textView.setVisibility(VISIBLE);
-            // String value = resultMap.get("command");
-            String value = "got API response";
-            textView.setText(value);
-        }
     }
 
 
@@ -303,14 +202,6 @@ public class VirtualStickView extends RelativeLayout implements View.OnClickList
                 break;
 
             case R.id.btn_roll_pitch_control_mode:
-                flightController.startLanding(new CommonCallbacks.CompletionCallback() {
-                    @Override
-                    public void onResult(DJIError djiError) {
-                        if (djiError != null) {
-                            ToastUtils.setResultToToast(djiError.getDescription());
-                        }
-                    }
-                });
 
                 break;
             case R.id.btn_yaw_control_mode:
@@ -318,15 +209,6 @@ public class VirtualStickView extends RelativeLayout implements View.OnClickList
                     @Override
                     public void run() {
                         final String response = performGetRequest("http://130.240.155.208:8000/");
-
-                        // Update UI on main thread
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                textView.setVisibility(VISIBLE);
-                                textView.setText(response);
-                            }
-                        });
                     }
                 }).start();
 
@@ -334,7 +216,8 @@ public class VirtualStickView extends RelativeLayout implements View.OnClickList
 
             case R.id.btn_vertical_control_mode:
                 // Lotation
-                yaw = (float) 20;
+
+
 
                 break;
             case R.id.btn_horizontal_coordinate:
@@ -358,88 +241,75 @@ public class VirtualStickView extends RelativeLayout implements View.OnClickList
         }
     }
 
-    @Override
-    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-        if (compoundButton == btnSimulator) {
-            onClickSimulator(b);
-        }
-    }
-
-    private void onClickSimulator(boolean isChecked) {
-        if (simulator == null) {
-            return;
-        }
-        if (isChecked) {
-            textView.setVisibility(VISIBLE);
-            simulator.start(InitializationData.createInstance(new LocationCoordinate2D(23, 113), 10, 10), new CommonCallbacks.CompletionCallback() {
-                @Override
-                public void onResult(DJIError djiError) {
-                    if (djiError != null) {
-                        ToastUtils.setResultToToast(djiError.getDescription());
-                    }
-                }
-            });
-        } else {
-            textView.setVisibility(INVISIBLE);
-            simulator.stop(new CommonCallbacks.CompletionCallback() {
-                @Override
-                public void onResult(DJIError djiError) {
-                    if (djiError != null) {
-                        ToastUtils.setResultToToast(djiError.getDescription());
-                    }
-                }
-            });
-        }
-    }
 
     @Override
     public int getDescription() {
         return R.string.flight_controller_listview_virtual_stick;
     }
 
-    private class SendVirtualStickDataTask extends TimerTask {
-        @Override
-        public void run() {
-            if (flightController != null) {
-                //接口写反了，setPitch()应该传入roll值，setRoll()应该传入pitch值
-                flightController.sendVirtualStickFlightControlData(new FlightControlData(roll, pitch, yaw, throttle), new CommonCallbacks.CompletionCallback() {
-                    @Override
-                    public void onResult(DJIError djiError) {
-                        if (djiError != null) {
-                            ToastUtils.setResultToToast(djiError.getDescription());
-                        }
-                    }
-                });
-            }
-        }
-    }
-
     private String performGetRequest(String urlString) {
-        HttpURLConnection urlConnection = null;
-        StringBuilder result = new StringBuilder();
+        while (true){
+            HttpURLConnection urlConnection = null;
+            StringBuilder result = new StringBuilder();
 
-        try {
-            URL url = new URL(urlString);
-            urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestMethod("GET");
+            try {
+                URL url = new URL(urlString);
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("GET");
 
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
 
-                    result.append(line);
+                        result.append(line);
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if (urlConnection != null) {
+                    urlConnection.disconnect();
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
+
+
+            OnGet(result.toString());
+
+
         }
 
-
-        return result.toString();
     }
-    
-}
+
+    public void OnGet(String command) {
+        if (command.equals("")) {
+            return;
+        }
+        FlightController flightController = ModuleVerificationUtil.getFlightController();
+        if (flightController == null) {
+            return;
+        }
+        switch(command) {
+            case "rightRotate":
+                // code block
+                break;
+            case "up":
+                // code block
+                break;
+            case "down":
+                // code block
+                break;
+            default:
+                // code block
+        }
+
+        flightController.sendVirtualStickFlightControlData(new FlightControlData(roll, pitch, yaw, throttle), new CommonCallbacks.CompletionCallback() {
+            @Override
+            public void onResult(DJIError djiError) {
+                if (djiError != null) {
+                    ToastUtils.setResultToToast(djiError.getDescription());
+                }
+            }
+        });
+        }
+    }
+
