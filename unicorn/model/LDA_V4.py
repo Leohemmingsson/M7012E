@@ -115,8 +115,8 @@ def evaluate_model(model, X_test_scaled, y_test):
     cm = confusion_matrix(y_test, y_pred)
     cm_percentage = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis] * 100  # Convert counts to percentages
     
-    print("Confusion Matrix (Percentages):")
-    print(cm_percentage)
+    # print("Confusion Matrix (Percentages):")
+    # print(cm_percentage)
     
     # Optionally, display the confusion matrix using Seaborn for a more visual representation
     plt.figure(figsize=(10, 7))

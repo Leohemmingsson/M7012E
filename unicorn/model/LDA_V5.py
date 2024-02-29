@@ -89,8 +89,8 @@ def evaluate_model(model, X_test_scaled, y_test):
     print(f"Model accuracy: {accuracy*100:.2f}%")
     cm = confusion_matrix(y_test, y_pred)
     cm_percentage = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis] * 100
-    print("Confusion Matrix (Percentages):")
-    print(cm_percentage)
+    # print("Confusion Matrix (Percentages):")
+    # print(cm_percentage)
     plt.figure(figsize=(10, 7))
     sns.heatmap(cm_percentage, annot=True, fmt=".2f", cmap="Blues", xticklabels=model.classes_, yticklabels=model.classes_)
     plt.xlabel('Predicted Labels')
