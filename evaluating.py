@@ -66,7 +66,7 @@ def read_and_process_data(directory_path):
 model = joblib.load('my_trained_model.joblib') 
 
 # Evaluate on the new test data
-test_directory = '/home/suad/school/Unicorn Recorder/test'  # Adjust your test data path
+test_directory = 'C:/Users/leohe/Documents/gtec/Unicorn Suite/Hybrid Black/Unicorn Recorder/test2/'
 X_test, y_test = read_and_process_data(test_directory)
 y_pred = model.predict(X_test)
 accuracy = accuracy_score(y_test, y_pred)

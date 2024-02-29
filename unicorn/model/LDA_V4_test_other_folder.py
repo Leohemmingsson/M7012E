@@ -9,6 +9,7 @@ import os
 import pandas as pd
 import re
 import seaborn as sns
+from dotenv import load_dotenv
 
 def baseline_correction(df, columns=None):
     """Applies baseline correction to the DataFrame.
@@ -98,9 +99,11 @@ def evaluate_model(model, X_test_scaled, y_test):
     plt.title('Confusion Matrix (Percentages)')
     plt.show()
 
+
 # Example usage:
-train_directory_path = 'C:/Users/leohe/Documents/gtec/Unicorn Suite/Hybrid Black/Unicorn Recorder/test2/'
-test_directory_path = 'C:/Users/leohe/Documents/gtec/Unicorn Suite/Hybrid Black/Unicorn Recorder/test/'
+load_dotenv()
+train_directory_path = os.getenv('FILES2')
+test_directory_path = os.getenv('FILES')
 X_train, y_train, X_test, y_test = read_and_process_data(train_directory_path, test_directory_path)
 X_train_scaled, X_test_scaled, scaler = normalize_data(X_train, X_test)
 model = train_model(X_train_scaled, y_train)

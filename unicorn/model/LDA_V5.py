@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+from dotenv import load_dotenv
 import pandas as pd
 import re
 import seaborn as sns
@@ -100,7 +101,8 @@ def evaluate_model(model, X_test_scaled, y_test):
 
 
 # Example usage
-directory_path = 'C:/Users/leohe/Documents/gtec/Unicorn Suite/Hybrid Black/Unicorn Recorder/test2/'
+load_dotenv()
+directory_path = os.getenv('FILES2')
 X, y = read_and_process_data(directory_path)
 X_train_scaled, X_test_scaled, y_train, y_test, scaler = split_and_normalize_data(X, y)
 model = train_model(X_train_scaled, y_train)
