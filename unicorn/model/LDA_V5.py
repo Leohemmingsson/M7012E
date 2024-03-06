@@ -28,6 +28,7 @@ def read_and_label(file_path):
         df = pd.read_csv(file_path).iloc[100:]
         df = baseline_correction(df)
         df['Label'] = label
+        
         return df
     except pd.errors.EmptyDataError:
         print(f"Error reading {file_path}: File is empty or does not exist.")
