@@ -11,6 +11,8 @@ import pandas as pd
 import re
 import seaborn as sns
 from dotenv import load_dotenv
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning) 
 
 def baseline_correction(df, columns=None):
     """Applies baseline correction to the DataFrame.
@@ -46,6 +48,7 @@ def read_and_process_data(directory_path):
             if not df.empty:
                 data_frames.append(df)
     data = pd.concat(data_frames, ignore_index=True)
+    data = data.drop(['Counter', 'Validation Indicator', 'Battery Level', 'Accelerometer X', 'Accelerometer Y', "Accelerometer Z", "Gyroscope X", "Gyroscope Y", "Gyroscope Z"], axis=1)
     X = data.drop(['Label'], axis=1)
     y = data['Label']
     X.fillna(X.mean(), inplace=True)  # Handling missing values by replacing them with column means
@@ -98,12 +101,6 @@ def train_model(X_train_scaled, y_train):
     lda.fit(X_train_scaled, y_train)
     return lda
 
-# def evaluate_model(model, X_test_scaled, y_test):
-#     """Evaluates the trained model using accuracy metric."""
-#     y_pred = model.predict(X_test_scaled)
-#     accuracy = accuracy_score(y_test, y_pred)
-#     print(f"Model accuracy: {accuracy*100:.2f}%")
-
 
 
 def evaluate_model(model, X_test_scaled, y_test):
@@ -131,6 +128,9 @@ def evaluate_model(model, X_test_scaled, y_test):
 # Example usage:
 load_dotenv()
 directory_path = os.getenv('FILES2')
+print(f".env: {directory_path}")
+directory_path="C:/Users/leohe/Documents/Programming/M7012E/unicorn/data"
+print(f"Running in directory: {directory_path}")
 X, y = read_and_process_data(directory_path)
 X_train_scaled, X_test_scaled, y_train, y_test, scaler = split_and_normalize_data(X, y)
 model = train_model(X_train_scaled, y_train)
