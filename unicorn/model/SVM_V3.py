@@ -1,3 +1,4 @@
+import pickle
 import os
 import pandas as pd
 import numpy as np
@@ -79,6 +80,10 @@ def read_and_process_data(directory_path):
     X = data.drop(['Label'], axis=1)
     y = data['Label']
 
+
+    return X, y
+
+def get_transformed_x_and_pipeline(X):
     # Create the preprocessing pipeline
     preprocessing_pipeline = Pipeline([
         ('imputer', SimpleImputer(strategy='mean')),
@@ -88,11 +93,11 @@ def read_and_process_data(directory_path):
 
     # Apply preprocessing
     X_transformed = preprocessing_pipeline.fit_transform(X)
-
-    return X_transformed, y
+    return X_transformed, preprocessing_pipeline
 
 def train_model(X_train, y_train):
     """Trains a Support Vector Machine (SVM) model."""
+
     svm = SVC(kernel='rbf', C=1.0, random_state=42)
     svm.fit(X_train, y_train)
     return svm
@@ -105,14 +110,30 @@ def evaluate_model(model, X_test, y_test):
 
 # Example Usage
 # Adjust the directory path according to your dataset location
-directory_path = '/home/suad/school/Unicorn Recorder/data'  # Change this to your directory path
+directory_path="C:/Users/leohe/Documents/gtec/Unicorn Suite/Hybrid Black/Unicorn Recorder/data/"
 X, y = read_and_process_data(directory_path)
 
 # Split the data
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
+X_train, preprocess_pipeline= get_transformed_x_and_pipeline(X_train)
+
+X_test = preprocess_pipeline.transform(X_test)
+
+
+
 # Train and evaluate the model
 model = train_model(X_train, y_train)
 evaluate_model(model, X_test, y_test)
 
+folder = ""
 
+file_path = folder + 'svm.pkl'
+with open(file_path, 'wb') as file:
+    pickle.dump(model, file)
+
+file_path = folder + 'pipeline.pkl'
+with open(file_path, 'wb') as file:
+    pickle.dump(preprocess_pipeline, file)
+
+print("Saved model and pipeline")
