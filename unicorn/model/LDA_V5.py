@@ -42,6 +42,7 @@ def read_and_label(file_path, filter_alpha=True):
         if filter_alpha:
             df = apply_bandpass_filter(df)  # Apply bandpass filter for alpha waves
         df['Label'] = label
+        
         return df
     except pd.errors.EmptyDataError:
         print(f"Error reading {file_path}: File is empty or does not exist.")

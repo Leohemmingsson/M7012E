@@ -27,6 +27,7 @@ def read_and_label(file_path, label):
     """Reads a CSV file, labels it based on provided label, and removes the first 100 rows."""
     try:
         df = pd.read_csv(file_path).iloc[100:]  # Skip first 100 rows
+        
         df = baseline_correction(df)  # Apply baseline correction
         df['Label'] = label
         return df
