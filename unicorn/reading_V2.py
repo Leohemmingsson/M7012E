@@ -21,33 +21,28 @@ def connect_and_acquire_data(serial_number):
         data_buffer = bytearray(buffer_size)
         
         
-        all_choices = {"dummy": 1, "up": 6, "down": 2, "rotate": 3, "forward": 1}
+        all_choices = {"rotate": 0, "forward": 0}
         filepath="C:/Users/leohe/Documents/gtec/Unicorn Suite/Hybrid Black/Unicorn Recorder/data/"
         retry = False
         counter = 1
 
         while True:
             if not retry:
-                command = random.choice(["dummy", "up", "down", "rotate", "forward"])
+                command = random.choice(["rotate", "forward"])
 
                 print(all_choices)
                 print(command)
                 print("Press Enter to start data acquisition...")
                 x = str(input())
+                time.sleep(1)
                 if x != "":
                     x = x.lower()
                     x = x.strip()
 
                     match x:
                         case "a":
-                            command = "dummy"
-                        case "s":
-                            command = "up"
-                        case "d":
-                            command = "down"
-                        case "f":
                             command = "rotate"
-                        case "g":
+                        case "s":
                             command = "forward"
                         case _:
                             print("something went wrong")

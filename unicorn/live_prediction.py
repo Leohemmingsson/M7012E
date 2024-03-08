@@ -11,7 +11,7 @@ def connect_and_acquire_data(serial_number):
         
         
         # Define the number of scans to read in each iteration to match the desired interval.
-        number_of_scans = 500 # Adjust based on the actual sampling rate and desired interval.
+        number_of_scans = 250 # Adjust based on the actual sampling rate and desired interval.
         number_of_channels = device.GetNumberOfAcquiredChannels()
         scan_size = number_of_channels * 4  # Each channel's data is a 32-bit float.
         buffer_size = number_of_scans * scan_size
@@ -30,8 +30,6 @@ def connect_and_acquire_data(serial_number):
             preprocess_pipeline = pickle.load(file)
         
 
-        print("Press Enter to start data acquisition...")
-        input()
         while True:
             device.StartAcquisition(True)
 
@@ -64,7 +62,7 @@ def connect_and_acquire_data(serial_number):
             print()
 
 
-            time.sleep(2)
+            time.sleep(1)
 
             # except Exception as e:
             #     print(f"An error occurred: {e}")

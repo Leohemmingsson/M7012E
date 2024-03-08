@@ -56,7 +56,7 @@ def get_highest_occurrence(arr):
     return unique[np.argmax(counts)]
 
 # Adjust the file_path to the specific file you want to process
-file_path = "C:/Users/leohe/Documents/gtec/Unicorn Suite/Hybrid Black/Unicorn Recorder/data/down12.csv"
+file_path = "C:/Users/leohe/Documents/gtec/Unicorn Suite/Hybrid Black/Unicorn Recorder/data/test/dummy10.csv"
 X, true_label = read_and_process_file(file_path)
 
 folder = ""

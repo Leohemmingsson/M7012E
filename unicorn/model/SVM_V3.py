@@ -37,7 +37,8 @@ def read_and_label(file_path):
     """Reads a CSV file, labels it based on its filename, and removes the first 100 rows."""
     label = re.sub('[0-9]*', '', os.path.basename(file_path).split('.csv')[0])
     try:
-        df = pd.read_csv(file_path).iloc[100:]  # Skip first 100 rows
+        # df = pd.read_csv(file_path).iloc[50:]  # Skip first 100 rows
+        df = pd.read_csv(file_path)
         df['Label'] = label
         return df
     except pd.errors.EmptyDataError:
@@ -56,7 +57,7 @@ def preprocess_eeg_data(data, fs=250):
         data[column] = scale_signal(data[column])
     return data
 
-def baseline_correction(df, columns=None):
+def _NOT_USED_baseline_correction(df, columns=None):
     """Applies baseline correction to the DataFrame."""
     if columns is None:
         columns = df.columns

@@ -35,6 +35,7 @@ def preprocess_eeg_data(data, fs=250):
 
 def read_and_process_file(values):
     df = pd.DataFrame(values[1:], columns=values[0], dtype=float)
+    # df = df.iloc[50:]
     if not df.empty:
         df = preprocess_eeg_data(df)
 
