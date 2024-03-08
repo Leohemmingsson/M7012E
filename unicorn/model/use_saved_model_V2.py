@@ -47,6 +47,7 @@ def read_and_process_file(file_path):
     df = read_and_label(file_path)
     if not df.empty:
         df = preprocess_eeg_data(df)
+    df = df.drop(["Accelerometer X", "Accelerometer Y", "Accelerometer Z", "Gyroscope X", "Gyroscope Y", "Gyroscope Z", "Battery Level", "Counter", "Validation Indicator"], axis=1) 
     X = df.drop(['Label'], axis=1)
     return X, df['Label']
 
@@ -55,7 +56,7 @@ def get_highest_occurrence(arr):
     return unique[np.argmax(counts)]
 
 # Adjust the file_path to the specific file you want to process
-file_path = "C:/Users/leohe/Documents/gtec/Unicorn Suite/Hybrid Black/Unicorn Recorder/data/up1.csv"
+file_path = "C:/Users/leohe/Documents/gtec/Unicorn Suite/Hybrid Black/Unicorn Recorder/data/down12.csv"
 X, true_label = read_and_process_file(file_path)
 
 folder = ""
@@ -67,12 +68,12 @@ pipeline_path = folder +'pipeline.pkl'
 with open(pipeline_path, 'rb') as file:
     preprocess_pipeline = pickle.load(file)
 
-# Transform X using the pre-processing pipeline and predict using the loaded model
 X_transformed = preprocess_pipeline.transform(X)
 y_pred = loaded_svm_model.predict(X_transformed)
 
 y_pred = get_highest_occurrence(y_pred)
 true_label = get_highest_occurrence(true_label)
+
 
 print("Predicted labels:", y_pred)
 print("True label:", true_label)

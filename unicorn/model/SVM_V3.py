@@ -77,6 +77,7 @@ def read_and_process_data(directory_path):
                 df = preprocess_eeg_data(df)  # Preprocess EEG data
                 data_frames.append(df)
     data = pd.concat(data_frames, ignore_index=True)
+    data = data.drop(["Accelerometer X", "Accelerometer Y", "Accelerometer Z", "Gyroscope X", "Gyroscope Y", "Gyroscope Z", "Battery Level", "Counter", "Validation Indicator"], axis=1) 
     X = data.drop(['Label'], axis=1)
     y = data['Label']
 
@@ -88,7 +89,7 @@ def get_transformed_x_and_pipeline(X):
     preprocessing_pipeline = Pipeline([
         ('imputer', SimpleImputer(strategy='mean')),
         ('scaler', StandardScaler()),
-        ('ica', FastICA(n_components=10, random_state=42))
+        ('ica', FastICA(n_components=8, random_state=42))
     ])
 
     # Apply preprocessing
@@ -121,10 +122,30 @@ X_train, preprocess_pipeline= get_transformed_x_and_pipeline(X_train)
 X_test = preprocess_pipeline.transform(X_test)
 
 
-
 # Train and evaluate the model
 model = train_model(X_train, y_train)
 evaluate_model(model, X_test, y_test)
+
+y_pred = model.predict(X_test)
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.metrics import confusion_matrix
+
+# Assuming y_test and y_pred are already defined
+# y_pred = model.predict(X_test)  # This should be done already in your evaluate_model function
+
+# Calculate the confusion matrix
+cm = confusion_matrix(y_test, y_pred)
+
+# Display the confusion matrix using seaborn for a more visually appealing format
+plt.figure(figsize=(10, 7))  # Adjust the size as needed
+sns.set(font_scale=1.4)  # Adjust font size for readability
+sns.heatmap(cm, annot=True, fmt='g', cmap='Blues', xticklabels=sorted(y_test.unique()), yticklabels=sorted(y_test.unique()))
+plt.xlabel('Predicted labels')
+plt.ylabel('True labels')
+plt.title('Confusion Matrix')
+plt.show()
 
 folder = ""
 

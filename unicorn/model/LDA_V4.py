@@ -129,7 +129,7 @@ def evaluate_model(model, X_test_scaled, y_test):
 load_dotenv()
 directory_path = os.getenv('FILES2')
 print(f".env: {directory_path}")
-directory_path="C:/Users/leohe/Documents/Programming/M7012E/unicorn/data"
+directory_path= "C:/Users/leohe/Documents/gtec/Unicorn Suite/Hybrid Black/Unicorn Recorder/data"
 print(f"Running in directory: {directory_path}")
 X, y = read_and_process_data(directory_path)
 X_train_scaled, X_test_scaled, y_train, y_test, scaler = split_and_normalize_data(X, y)
